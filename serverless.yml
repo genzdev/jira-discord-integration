@@ -1,0 +1,47 @@
+service: jira-discord-integration
+
+provider:
+  name: aws
+  stage: dev
+  profile: prdev
+  runtime: nodejs12.x
+  region: ca-central-1
+  apiGateway:
+    shouldStartNameWithService: true
+
+functions:
+  message:
+    handler: handler.message
+    events:
+      - http:
+          path: message/{webhook}/{snowflake}
+          method: post
+          cors: true
+          request:
+            parameters:
+              paths:
+                webhook: true
+                snowflake: true
+      - http:
+          path: message/{webhook}
+          method: post
+          cors: true
+          request:
+            parameters:
+              paths:
+                webhook: true
+                snowflake: false
+      - http:
+          path: message
+          method: post
+          cors: true
+          request:
+            parameters:
+              paths:
+                webhook: false
+                snowflake: false
+plugins:
+  - serverless-offline
+custom:
+  serverless-offline:
+    httpPort: 4000
